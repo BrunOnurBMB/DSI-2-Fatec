@@ -32,23 +32,23 @@ class Sala extends CI_Controller{
     }
 
     // Setters dos atributos
-    public function setCodigo(){
+    public function setCodigo($codigoFront){
         $this->codigo = $codigoFront;
     }
 
-    public function setDescricao(){
+    public function setDescricao($descricaoFront){
         $this->descricao = $descricaoFront;
     }
 
-    public function setAndar(){
+    public function setAndar($andarFront){
         $this->andar = $andarFront;
     }
 
-    public function setCapacidade(){
+    public function setCapacidade($capacidadeFront){
         $this->capacidade = $capacidadeFront;
     }
 
-    public function setEstatus(){
+    public function setEstatus($estatusFront){
         $this->estatus = $estatusFront;
     }
 
@@ -71,10 +71,10 @@ class Sala extends CI_Controller{
 
             // Array com os dados que deverão vir do front
             $lista = array(
-                "codigo" -> '0',
-                "descricao" -> '0',
-                "andar" -> '0',
-                "capacidade" -> '0'
+                "codigo" => '0',
+                "descricao" => '0',
+                "andar" => '0',
+                "capacidade" => '0'
             );
 
             if(verificarParam($resultado, $lista) == 1){
@@ -86,23 +86,23 @@ class Sala extends CI_Controller{
 
                 // validação para verificar se todos os dados foram enviados
                 if(trim($this->getCodigo()) == '' || $this->getCodigo() == 0){
-                    $retorno = array('codigo' = > 2,
+                    $retorno = array('codigo' => 2,
                                      'msg' => 'Código não informado.');
                 }elseif(trim($this->getDescricao()) == ''){
-                    $retorno = array('codigo' => 3
+                    $retorno = array('codigo' => 3,
                                      'msg' => 'Descrição não informada.');
                 }elseif(trim($this->getAndar()) == '' || trim($this->getAndar()) == 0){
-                    $retorno = array('codigo' => 4
+                    $retorno = array('codigo' => 4,
                                      'msg' => 'Andar não informado.');
                 }elseif (trim($this->getCapacidade()) == '' || trim($this->getCapacidade()) == 0){
-                    $retorno = array('codigo' => 5
+                    $retorno = array('codigo' => 5,
                                      'msg' => 'Capacidade não informada.');
                 }else{
                     // Realizando a instância da Model
                     $this->load->model('M_sala');
 
                     // atributo $retorno recebe array com informações da validação de acesso
-                    $retorno = $this->M_sala->inserir($this->getCodigo(), $this->getDescricao()
+                    $retorno = $this->M_sala->inserir($this->getCodigo(), $this->getDescricao(),
                                                       $this->getAndar(), $this->getCapacidade());
                 }
             }else{
@@ -114,7 +114,7 @@ class Sala extends CI_Controller{
         } catch (Exception $e) {
             $retorno = array('codigo' => 0,
                              'msg' => 'ATENÇÃO: O seguinte erro aconteceu ->',
-                                        $e->getMessage())
+                                        $e->getMessage());
         }
 
         //Retorno no dromato JSON
@@ -158,11 +158,11 @@ class Sala extends CI_Controller{
                 $retorno = array(
                     'codigo' => 99,
                     'msg' => 'Os campos vindos do FrontEnd não representam o método de Consulta. Verifique.'
-                )
+                );
             }
         } catch (Exception $e) {
-            $retorno = array('codigo' => 0
-                             'msg' => 'Atenção o seguinte erro aconteceu ->'
+            $retorno = array('codigo' => 0,
+                             'msg' => 'Atenção o seguinte erro aconteceu -> ',
                                         $e=>getMessage());
         }
         //Retorno no formato JSON
@@ -184,10 +184,10 @@ class Sala extends CI_Controller{
 
             // Array com os dados que deverão vir do front
             $lista = array(
-                "codigo" -> '0',
-                "descricao" -> '0',
-                "andar" -> '0',
-                "capacidade" -> '0'
+                "codigo" => '0',
+                "descricao" => '0',
+                "andar" => '0',
+                "capacidade" => '0'
             );
 
             if(verificarParam($resultado, $lista) == 1){
@@ -199,19 +199,19 @@ class Sala extends CI_Controller{
 
                 //Validação para tipo de usuário que deverá ser ADMINISTRADOR, COMUM ou VAZIO
                 if (trim($this->getCodigo() == '')) {
-                    $retorno = array('codigo' => 2
+                    $retorno = array('codigo' => 2,
                                      'msg' => 'Código não informado');
                 // Descrição, andar ou capacidade, pelo menos 1 deles precisa ser infromado.
                 }elseif (trim($this->getDescricao()) == '' && trim($this->getAndar()) == '' && 
                 trim($this->getCapacidade()) == '') {
-                    $retorno = array('codigo' = 3,
+                    $retorno = array('codigo' => 3,
                                      'msg' => 'Pelo menos um parâmetro precisa ser passado para atualização');
                 }else {
                     //Realizandoa a instãncia da Model
                     $this->load->model('M_sala');
 
                     //Atributo $retorno recebe array com inftomações da alteração dos dados
-                    $retorno = $this->M_sala->alterar($this->getCodigo(), $this->getDescricao()
+                    $retorno = $this->M_sala->alterar($this->getCodigo(), $this->getDescricao(),
                                                       $this->getAndar(), $this->getCapacidade());
                 }
             }else {
@@ -221,7 +221,7 @@ class Sala extends CI_Controller{
                 );
             }
         } catch (Exception $e) {
-            $retorno = array('codigo' -> 0,
+            $retorno = array('codigo' => 0,
                              'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
                                         $e->getMessege());
         }
@@ -243,7 +243,7 @@ class Sala extends CI_Controller{
 
             // Array com os dados que deverão vir do front
             $lista = array(
-                "codigo" -> '0'
+                "codigo" => '0'
             );
 
             if (verificarParam($resultado, $lista) == 1) {

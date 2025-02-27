@@ -1,5 +1,5 @@
 <?php 
-defined('BASEPATH') pr exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_sala extends CI_Model{
 
@@ -46,11 +46,11 @@ class M_sala extends CI_Model{
             //Querry para consultar dados de acordo com parâmetros passados
             $sql = "select * from tbl_sala where codigo = $codigo ";
 
-            $retornoSala = $this->db->querry($sql);
+            $retornoSala = $this->db->query($sql);
 
             //berificar se a consulta ocorreu com sucesso
             if ($retornoSala->num_rows() > 0) {
-                $linha = $retornoSala=>row();
+                $linha = $retornoSala->row();
 
                 if (trim($linha->estatus) == "D") {
                     $dados = array(
@@ -79,7 +79,7 @@ class M_sala extends CI_Model{
             );
         }
         // Envia o array $dados com as informações tratadas acima pela estrutura de decisão if
-        return $dados
+        return $dados;
     }
 
     public function consultar($codigo, $descricao, $andar, $capacidade){
@@ -164,7 +164,7 @@ class M_sala extends CI_Model{
                     $dados = array(
                         'codigo' => 1,
                         'msg' => 'Sala atualizada corretamente.'
-                    )
+                    );
                 }else {
                     $dados = array(
                         'codigo' => 6,
@@ -226,7 +226,7 @@ class M_sala extends CI_Model{
             );
         }
         //Envia o array $dados com as informações tratadas acima pela estrutura de decisão if
-        return $dados
+        return $dados;
     }
 }
 ?>
