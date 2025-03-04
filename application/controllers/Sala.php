@@ -10,7 +10,7 @@ class Sala extends CI_Controller{
     private $capacidade;
     private $estatus;
 
-    // Getters dis atributos
+    // Getters dos atributos
     public function getCodigo(){
         return $this->codigo;
     }
@@ -108,13 +108,13 @@ class Sala extends CI_Controller{
             }else{
                 $retorno = array(
                     'codigo' => 99,
-                    'msg' => 'os campos vindos do FrontEnd não representam o médotodo de Inersção, verifique.'
-                );
+                    'msg' => 'os campos vindos do FrontEnd não representam o médotodo de Inersção, verifique.');
             }
         } catch (Exception $e) {
-            $retorno = array('codigo' => 0,
-                             'msg' => 'ATENÇÃO: O seguinte erro aconteceu ->',
-                                        $e->getMessage());
+            $retorno = array(
+                'codigo' => 0,
+                'msg' => 'ATENÇÃO: O seguinte erro aconteceu ->',
+                $e->getMessage());
         }
 
         //Retorno no dromato JSON
@@ -157,13 +157,13 @@ class Sala extends CI_Controller{
             }else{
                 $retorno = array(
                     'codigo' => 99,
-                    'msg' => 'Os campos vindos do FrontEnd não representam o método de Consulta. Verifique.'
-                );
+                    'msg' => 'Os campos vindos do FrontEnd não representam o método de Consulta. Verifique.');
             }
         } catch (Exception $e) {
-            $retorno = array('codigo' => 0,
-                             'msg' => 'Atenção o seguinte erro aconteceu -> ',
-                                        $e=>getMessage());
+            $retorno = array(
+                'codigo' => 0,
+                'msg' => 'Atenção o seguinte erro aconteceu -> ',
+                $e=>getMessage());
         }
         //Retorno no formato JSON
         echo json_encode($retorno);
@@ -199,13 +199,16 @@ class Sala extends CI_Controller{
 
                 //Validação para tipo de usuário que deverá ser ADMINISTRADOR, COMUM ou VAZIO
                 if (trim($this->getCodigo() == '')) {
-                    $retorno = array('codigo' => 2,
-                                     'msg' => 'Código não informado');
+                    $retorno = array(
+                        'codigo' => 2,
+                        'msg' => 'Código não informado');
+
                 // Descrição, andar ou capacidade, pelo menos 1 deles precisa ser infromado.
                 }elseif (trim($this->getDescricao()) == '' && trim($this->getAndar()) == '' && 
                 trim($this->getCapacidade()) == '') {
-                    $retorno = array('codigo' => 3,
-                                     'msg' => 'Pelo menos um parâmetro precisa ser passado para atualização');
+                    $retorno = array(
+                        'codigo' => 3,
+                        'msg' => 'Pelo menos um parâmetro precisa ser passado para atualização');
                 }else {
                     //Realizandoa a instãncia da Model
                     $this->load->model('M_sala');
@@ -217,13 +220,13 @@ class Sala extends CI_Controller{
             }else {
                 $retorno = array(
                     'codigo' => 99,
-                    'msg' => 'Os campos vindos do FrontEnd não representam o método de alteração. Verifique.'
-                );
+                    'msg' => 'Os campos vindos do FrontEnd não representam o método de alteração. Verifique.');
             }
         } catch (Exception $e) {
-            $retorno = array('codigo' => 0,
-                             'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
-                                        $e->getMessege());
+            $retorno = array(
+                'codigo' => 0,
+                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
+                $e->getMessege());
         }
         //Retorno no formato JSON
         echo json_encode($retorno);
@@ -255,8 +258,9 @@ class Sala extends CI_Controller{
 
                 //Validação das informações
                 if (trim($this->getCodigo()) == '') {
-                    $retorno = array('codigo' => 2,
-                                     'msg' => 'Código não informado');
+                    $retorno = array(
+                        'codigo' => 2,
+                        'msg' => 'Código não informado');
                 }else {
                     //Realiza a instância da Model
                     $this->load->model('M_sala');
@@ -267,13 +271,13 @@ class Sala extends CI_Controller{
             }else {
                 $retorno = array(
                     'codigo' => 99,
-                    'msg' => 'Os campos vindos do FrontEnd não representam o método de login. Verifique.'
-                );
+                    'msg' => 'Os campos vindos do FrontEnd não representam o método de login. Verifique.');
             }
         } catch (Exception $e) {
-            $retorno = array('codigo' => 0,
-                             'msg' => 'ATENÇÃO: o seguinte erro aconteceu -> ',
-                                       $e->getMessage());
+            $retorno = array(
+                'codigo' => 0,
+                'msg' => 'ATENÇÃO: o seguinte erro aconteceu -> ',
+                $e->getMessage());
         }
 
         //Retorno no formato JSON
