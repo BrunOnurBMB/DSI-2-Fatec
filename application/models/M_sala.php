@@ -53,11 +53,6 @@ class M_sala extends CI_Model
             if ($retornoSala->num_rows() > 0) {
                 $linha = $retornoSala->row();
 
-                // Inicializar estatus com um valor padrão se não estiver definido
-                if (!property_exists($linha, 'estatus') || $linha->estatus == null) {
-                    $linha->estatus = '';
-                }
-
                 if (trim($linha->estatus) == "D") {
                     $dados = array(
                         'codigo' => 7,
@@ -87,7 +82,7 @@ class M_sala extends CI_Model
     {
         try {
             //Querry para consultar dados de acordo com prâmetros passados
-            $sql = "select * from tbl_sala where status = '' ";
+            $sql = "select * from tbl_sala where estatus = '' ";
 
             if (trim($codigo) != '') {
                 $sql = $sql . " and codigo = $codigo ";
@@ -141,19 +136,19 @@ class M_sala extends CI_Model
 
                 //Comparando os items
                 if ($descricao !== '') {
-                    $query .= "descricao = '$descricao', ";
+                    $query .= " descricao = '$descricao', ";
                 }
 
                 if ($andar !== '') {
-                    $query .= "andar = $andar, ";
+                    $query .= " andar = $andar, ";
                 }
 
                 if ($capacidade !== '') {
-                    $query .= "capacidade = $capacidade, ";
+                    $query .= " capacidade = $capacidade, ";
                 }
 
                 //Terminando a concatenação da querry
-                $queryFinal = trim($query, ", ") . " where codigo = $codigo";
+                $queryFinal = trim($query, ", ") . " where codigo = $codigo ";
 
                 //Executando a query de atualização dos dados
                 $this->db->query($queryFinal);
