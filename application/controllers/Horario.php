@@ -291,7 +291,6 @@ class Horario extends CI_Controller
                 // Fazendo os setters
                 $this->setCodigo($resultado->codigo);
 
-
                 //Codigo é obrigatório
                 if (trim($this->getCodigo() == '')) {
                     $retorno = array(
