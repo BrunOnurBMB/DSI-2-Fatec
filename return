@@ -1,0 +1,530 @@
+[1mdiff --git a/application/controllers/Turma.php b/application/controllers/Turma.php[m
+[1mdeleted file mode 100644[m
+[1mindex ddfdad9..0000000[m
+[1m--- a/application/controllers/Turma.php[m
+[1m+++ /dev/null[m
+[36m@@ -1,298 +0,0 @@[m
+[31m-<?php[m
+[31m-defined('BASEPATH') OR exit('No direct script access allowed');[m
+[31m- [m
+[31m-class Turma extends CI_Controller {[m
+[31m-    //Atributos privados[m
+[31m-    private $codigo;[m
+[31m-    private $descricao;[m
+[31m-    private $capacidade;[m
+[31m-    private $dataInicio;[m
+[31m-    private $estatus;[m
+[31m-[m
+[31m-    //Getter dos atributos[m
+[31m-    public function getCodigo(){[m
+[31m-        return $this->codigo;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function getDataInicio(){[m
+[31m-        return $this->dataInicio;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function getDescricao(){[m
+[31m-        return $this->descricao;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function getCapacidade(){[m
+[31m-        return $this->capacidade;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function getEstatus(){[m
+[31m-        return $this->estatus;[m
+[31m-    }[m
+[31m-[m
+[31m-    //setters dos atributos[m
+[31m-    public function setCodigo($codigoFront){[m
+[31m-        $this->codigo = $codigoFront;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function setDataInicio($dataInicio){[m
+[31m-        $this->dataInicio = $dataInicio;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function setDescricao($descricaoFront){[m
+[31m-        $this->descricao = $descricaoFront;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function setCapacidade($capacidadeFront){[m
+[31m-        $this->capacidade = $capacidadeFront;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function setEstatus($estatusFront){[m
+[31m-        $this->estatus = $estatusFront;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function inserir(){[m
+[31m-        /* [m
+[31m-        Descrição e capacidade recebidos via JSON e colocados em variáveis[m
+[31m-        Retornos possiveis:[m
+[31m-        1 - Turma cadastrada corretamente (Banco)[m
+[31m-        2 - Faltou informar a Descricao (Front)[m
+[31m-        3 - Faltou informar a Capacidade (Front)[m
+[31m-        4 - Faltou infotmar a data de início da turma (Front)[m
+[31m-        5 - Turma já cadastrada no sistema[m
+[31m-        6 - Houve algum problema no insert ad tabela (Banco) [m
+[31m-        */[m
+[31m-[m
+[31m-        try {[m
+[31m-            //Dados recebidos via JSOn e colocados ema tributos[m
+[31m-            $json = file_get_contents('php://input');[m
+[31m-            $resultado = json_decode($json);[m
+[31m-[m
+[31m-            //Array com os dados que deverão vir do Front[m
+[31m-            $lista = array([m
+[31m-                "descricao" => '0',[m
+[31m-                "capacidade" => '0',[m
+[31m-                "dataInicio" => '0'[m
+[31m-            );[m
+[31m-[m
+[31m-            if (verificarParam($resultado, $lista) == 1) {[m
+[31m-                //fazendo os setters[m
+[31m-                $this->setDescricao($resultado->descricao);[m
+[31m-                $this->setCapacidade($resultado->capacidade);[m
+[31m-                $this->setDataInicio($resultado->dataInicio);[m
+[31m-[m
+[31m-                //Faremos uma validação para sabermos se todos os dados forame enviados[m
+[31m-                if (trim($this->getDescricao()) == '') {[m
+[31m-                    $retorno = array([m
+[31m-                        'codigo' => 2,[m
+[31m-                        'msg' => 'Descrição não informada.'[m
+[31m-                    );[m
+[31m-                }elseif(trim($this->getCapacidade()) == ''){[m
+[31m-                    $retorno = array([m
+[31m-                        'codigo' => 3,[m
+[31m-                        'msg' => 'Capacidade não informada.'[m
+[31m-                    );[m
+[31m-                }elseif(trim($this->getDataInicio()) == ''){[m
+[31m-                    $retorno = array([m
+[31m-                        'codigo' => 4,[m
+[31m-                    'msg' => 'Data de início não informada.');[m
+[31m-                }else{[m
+[31m-                    //Realizando a intância da Model[m
+[31m-                    $this->load->model('M_turma');[m
+[31m-[m
+[31m-                    //Atributo retorno recebe array com informações da validação do acesso.[m
+[31m-                    $retorno = $this->M_turma->inserir([m
+[31m-                                                        $this->getDescricao(),[m
+[31m-                                                        $this->getCapacidade(),[m
+[31m-                                                        $this->getDataInicio());[m
+[31m-                }[m
+[31m-            }else{[m
+[31m-                $retorno = array([m
+[31m-                    'codigo' => 99,[m
+[31m-                    'msg' => 'Os campos vindos do FrontEnd não reprensetam o método de inserção. Verifique.'[m
+[31m-                );[m
+[31m-            }[m
+[31m-        } catch (Exception $e) {[m
+[31m-            $retorno = array([m
+[31m-                'codigo' => 0,[m
+[31m-                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',[m
+[31m-                $e->getMessage());[m
+[31m-        }[m
+[31m-[m
+[31m-        //Retorno em formato JSON[m
+[31m-        echo json_encode($retorno);[m
+[31m-    }[m
+[31m-[m
+[31m-    public function consultar(){[m
+[31m-        /* [m
+[31m-        Código, Descricção e Capacidade recebidos via JSON e colocados em varáveis[m
+[31m-        Retornos Possíveis:[m
+[31m-        1 - Dados consultados corretamente (Banco)[m
+[31m-        6 - Dados não encontrados (Banco)[m
+[31m-        */[m
+[31m-[m
+[31m-        try {[m
+[31m-            $json = file_get_contents('php://input');[m
+[31m-            $resultado = json_decode($json);[m
+[31m-[m
+[31m-            //Array com os dados que deverão vir do Front[m
+[31m-            $lista = array([m
+[31m-                "codigo" => '0',[m
+[31m-                "descricao" => '0',[m
+[31m-                "capacidade" => '0',[m
+[31m-                "dataInicio" => '0'[m
+[31m-            );[m
+[31m-[m
+[31m-            if (verificarParam($resultado, $lista) == 1) {[m
+[31m-                //fazendo os setters[m
+[31m-                $this->setCodigo($resultado->codigo);[m
+[31m-                $this->setDescricao($resultado->descricao);[m
+[31m-                $this->setCapacidade($resultado->capacidade);[m
+[31m-                $this->setDataInicio($resultado->dataInicio);[m
+[31m-[m
+[31m-                //Realizando a instância da Model[m
+[31m-                $this->load->model('M_turma');[m
+[31m-[m
+[31m-                //Atributo $retorno recebe array com as informações da consulta dos dados[m
+[31m-                $retorno = $this->M_turma->consultar([m
+[31m-                                                    $this->getCodigo(),[m
+[31m-                                                    $this->getDescricao(),[m
+[31m-                                                    $this->getCapacidade(),[m
+[31m-                                                    $this->getDataInicio());[m
+[31m-            }else{[m
+[31m-                $retorno = array([m
+[31m-                    'codigo' => 99,[m
+[31m-                    'msg' => 'Os campos vindos do ForntEnd não representam o método de consulta. Verfique.'[m
+[31m-                );[m
+[31m-            }[m
+[31m-        } catch (Exception $e) {[m
+[31m-            $retorno = array([m
+[31m-                'codigo' => 0,[m
+[31m-                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',[m
+[31m-                          $e->getMessage());[m
+[31m-        }[m
+[31m-[m
+[31m-        //Retorno no formato JSON[m
+[31m-        echo json_encode($retorno);[m
+[31m-    }[m
+[31m-[m
+[31m-    public function alterar(){[m
+[31m-        /*[m
+[31m-        Codigo, Descrição e Capacidade recebidos via JSON e colocados em variáveis[m
+[31m-        Retornos possíveis:[m
+[31m-        1 - Dado(s) alterado(s) corretanemtne (Banco)[m
+[31m-        2 - Código não informado ou Zerado[m
+[31m-        3 - Pelo menos um parâmetro deve ser passado[m
+[31m-        5 - Dados não encontrados (Banco)[m
+[31m-        */[m
+[31m-[m
+[31m-        try {[m
+[31m-            $json = file_get_contents('php://input');[m
+[31m-            $resultado =  json_decode($json);[m
+[31m-[m
+[31m-            //Array com os dados que deverão vir do Front[m
+[31m-            $lista = array([m
+[31m-                "codigo" => '0',[m
+[31m-                "descricao" => '0',[m
+[31m-                "capacidade" => '0',[m
+[31m-                "dataInicio" => '0'[m
+[31m-            );[m
+[31m-[m
+[31m-            if (verificarParam($resultado, $lista) == 1) {[m
+[31m-                //Fazendo os setters[m
+[31m-                $this->setCodigo($resultado->codigo);[m
+[31m-                $this->setDescricao($resultado->descricao);[m
+[31m-                $this->setCapacidade($resultado->capacidade);[m
+[31m-                $this->setDataInicio($resultado->dataInicio);[m
+[31m-[m
+[31m-                //Validações para passagem de atributos ou campo VAZIO[m
+[31m-                if (trim($this->getCodigo()) == '') {[m
+[31m-                    $retorno = array([m
+[31m-                        'codigo' => 2,[m
+[31m-                        'msg' => 'Código não informado');[m
+[31m-                //Nome, Senha ou Tipo de usuário, pelo menos 1 deles precisa set informado.[m
+[31m-                }elseif(trim($this->getDescricao() == '') && trim($this->getCapacidade() == '') && trim($this->getDataInicio() == '')){[m
+[31m-                    $retorno = array([m
+[31m-                        'codigo' => 3,[m
+[31m-                        'msg' => 'Pelo menos um parâmetro precisa ser passado para atualização.');[m
+[31m-                }else{[m
+[31m-                    //Realizando a instânciação da Model[m
+[31m-                    $this->load->model('M_turma');[m
+[31m-[m
+[31m-                    //Atributo $retorno recebe array com informações da alteração dos dados[m
+[31m-                    $retorno = $this->M_turma->alterar($this->getCodigo(),[m
+[31m-                                                       $this->getDescricao(),[m
+[31m-                                                       $this->getCapacidade(),[m
+[31m-                                                       $this->getDataInicio());[m
+[31m-                }[m
+[31m-            }else{[m
+[31m-                $retorno = array([m
+[31m-                    'codigo' => 99,[m
+[31m-                    'msg' => 'Os campos vindos do FrontEnd não representam o método da alteração. Verifique.');[m
+[31m-            }[m
+[31m-        } catch (Exception $e) {[m
+[31m-            $retorno = array([m
+[31m-                'codigo' => 0,[m
+[31m-                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',[m
+[31m-                          $e-> getMessage());[m
+[31m-        }[m
+[31m-        //Retorno no formato JSON[m
+[31m-        echo json_encode($retorno);[m
+[31m-    }[m
+[31m-[m
+[31m-    public function desativar(){[m
+[31m-        /*[m
+[31m-        Código da turma recebido via JSON e colocado em váriaveis[m
+[31m-        Retornos possíveis[m
+[31m-        1 - Turma desativada corretamente (Banco)[m
+[31m-        2 - Código da turma não infomado[m
+[31m-        5 - Houve algum problema na desativação da turma[m
+[31m-        6 - Dados não encontrados (Bancos)[m
+[31m-        */[m
+[31m-[m
+[31m-        try {[m
+[31m-            $json = file_get_contents('php://input');[m
+[31m-            $resultado = json_decode($json);[m
+[31m-[m
+[31m-            //Array com os dados que deverão vir do Front[m
+[31m-            $lista = array([m
+[31m-                "codigo" => '0');[m
+[31m-[m
+[31m-            if (verificarParam($resultado, $lista) == 1) {[m
+[31m-                $json = file_get_contents('php://input');[m
+[31m-                $resultado = json_decode($json);[m
+[31m-[m
+[31m-                //Fazendo os setters[m
+[31m-                $this->setCodigo($resultado->codigo);[m
+[31m-[m
+[31m-                //Validação para usuário que não deverá ser branco[m
+[31m-                if (trim($this->getCodigo() == '')) {[m
+[31m-                    $retorno = array([m
+[31m-                        'codigo' => 2,[m
+[31m-                        'msg' => 'Código não informado.');[m
+[31m-                }else{[m
+[31m-                    //Realizando a instância da Model[m
+[31m-                    $this->load->Model('M_turma');[m
+[31m-[m
+[31m-                    //Atributo $retorno recebe array com informações[m
+[31m-                    $retorno = $this->M_turma->desativar($this->getCodigo());[m
+[31m-                }[m
+[31m-            }else{[m
+[31m-                $retorno = array([m
+[31m-                    'codigo' => 99,[m
+[31m-                    'msg' => 'Os campos vidno do FrontEnd não representam o método de desativação. Verifique.'[m
+[31m-                );[m
+[31m-            }[m
+[31m-        } catch (Exception $e) {[m
+[31m-            $retorno = array([m
+[31m-                'codigo' => 0,[m
+[31m-                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',[m
+[31m-                          $e->getMessage());[m
+[31m-        }[m
+[31m-[m
+[31m-        //Retorno no formato JSON[m
+[31m-        echo json_encode($retorno);[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-?>[m
+\ No newline at end of file[m
+[1mdiff --git a/application/models/M_turma.php b/application/models/M_turma.php[m
+[1mdeleted file mode 100644[m
+[1mindex f6efb28..0000000[m
+[1m--- a/application/models/M_turma.php[m
+[1m+++ /dev/null[m
+[36m@@ -1,202 +0,0 @@[m
+[31m-<?php[m
+[31m-defined('BASEPATH') or exit('No direct script access allowed');[m
+[31m-[m
+[31m-class M_turma extends CI_Model{[m
+[31m-    public function inserir($descricao, $capacidade, $dataInicio){[m
+[31m-        try {[m
+[31m-            //Querry de inserção  dos dados[m
+[31m-            $this->db->query("insert into tbl_turma (descricao, capacidade, dataInicio) [m
+[31m-                                values ('$descricao', '$capacidade', '$dataInicio')");[m
+[31m-            [m
+[31m-                                //Verificar se a inserção ocorreu com sucesso[m
+[31m-            if ($this->db->affected_rows() > 0) {[m
+[31m-                $dados = array([m
+[31m-                    'codigo' => 1,[m
+[31m-                    'msg' => 'Turma cadastrada corretamente.');[m
+[31m-            }else{[m
+[31m-                $dados = array([m
+[31m-                    'codigo' => 6,[m
+[31m-                    'msg' => 'Houve algum problema na inserção de dados na tabela de turma.');[m
+[31m-            }[m
+[31m-        } catch (Exception $e) {[m
+[31m-            $dados = array([m
+[31m-                'codigo' => 00,[m
+[31m-                'msg' => 'ATENÇÃO: o seguinte erro aconteceu -> ',[m
+[31m-                $e->getMessage(), "\n");[m
+[31m-        }[m
+[31m-        //Envia o array $dados com as informações tratadas acima pela estrutura de decisão if[m
+[31m-        return $dados;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function consultar($codigo, $descricao, $capacidade, $dataInicio){[m
+[31m-        try {[m
+[31m-            //Querry para consultar dados de acordo com parâmetros passados[m
+[31m-            $sql = "select codigo, descricao, capacidade, dataInicio, [m
+[31m-                    date_format(dataInicio, '%d-%m-%Y') dataIniciobra[m
+[31m-                    from tbl_turma where estatus = '' ";[m
+[31m-[m
+[31m-            if (trim($codigo) != '') {[m
+[31m-                $sql = $sql . "and codigo = $codigo ";[m
+[31m-            }[m
+[31m-[m
+[31m-            if (trim($descricao) != '') {[m
+[31m-                $sql = $sql . "and descricao like '%$descricao%' ";[m
+[31m-            }[m
+[31m-[m
+[31m-            if (trim($capacidade) != '') {[m
+[31m-                $sql = $sql . "and capacidade = $capacidade ";[m
+[31m-            }[m
+[31m-[m
+[31m-            if (trim($dataInicio != '')) {[m
+[31m-                $sql = $sql . "and dataInicio = '$dataInicio' ";[m
+[31m-            }[m
+[31m-[m
+[31m-            $retorno = $this->db->query($sql);[m
+[31m-            //Verificar se a consulta ocorreu com sucesso[m
+[31m-            if ($retorno->num_rows() > 0) {[m
+[31m-                $dados = array([m
+[31m-                    'codigo' => 1,[m
+[31m-                    'msg' => 'Consulta efetuada com sucesso',[m
+[31m-                    'dados' => $retorno->result());[m
+[31m-            }else{[m
+[31m-                $dados = array([m
+[31m-                    'codigo' => 6,[m
+[31m-                    'msg' => 'Turma não encontrada.'[m
+[31m-                );[m
+[31m-            }[m
+[31m-        } catch (Exception $e) {[m
+[31m-            $dados = array([m
+[31m-                'codigo' => 00,[m
+[31m-                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',[m
+[31m-                $e->getMessage(), "\n");[m
+[31m-        }[m
+[31m-        //Envia o array $dados com as informações tratadas acima pela estrutuda de decisão if[m
+[31m-        return $dados;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function consultaTurmaCod($codigo){[m
+[31m-        try {[m
+[31m-            //Query para consultar dados de acordo com parâmetros passados[m
+[31m-            $sql = "select * from tbl_turma where codigo = $codigo  and estatus = ''";[m
+[31m-[m
+[31m-            $retornoSala = $this->db->query($sql);[m
+[31m-[m
+[31m-            //Verifica se a consulta ocorreu com sucesso[m
+[31m-            if ($retornoSala->num_rows() > 0) {[m
+[31m-                $dados = array([m
+[31m-                    'codigo' => 1,[m
+[31m-                    'msg' => 'Consulta efetuada com sucesso.');[m
+[31m-            }else{[m
+[31m-                $dados = array([m
+[31m-                    'codigo' => 6,[m
+[31m-                    'msg' => 'Turma não encontrada.');[m
+[31m-            }[m
+[31m-        } catch (Exception $e) {[m
+[31m-            $dados = array([m
+[31m-                'codigo' => 00,[m
+[31m-                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',[m
+[31m-                $e->getMessage(), "\n");[m
+[31m-        }[m
+[31m-        //Envia o array $dados com as informações tratadas acima pela estrutura de decisão if[m
+[31m-        return $dados;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function alterar($codigo, $descricao, $capacidade, $dataInicio){[m
+[31m-        try {[m
+[31m-            //verifica se a turma já está cadastrada[m
+[31m-            $retornoConsulta = $this->consultaTurmaCod($codigo);[m
+[31m-[m
+[31m-            if (is_array($retornoConsulta) && isset($retornoConsulta['codigo']) && $retornoConsulta['codigo'] == 1) {[m
+[31m-[m
+[31m-                //Monta a query dinâmica[m
+[31m-                $query = "UPDATE tbl_turma SET ";[m
+[31m-                $updates = [];[m
+[31m-[m
+[31m-                if ($descricao !== '') {[m
+[31m-                    $updates[] = "descricao = '$descricao'";[m
+[31m-                }[m
+[31m-                if ($capacidade !== '') {[m
+[31m-                    $updates[] = "capacidade = $capacidade";[m
+[31m-                }[m
+[31m-                if ($dataInicio !== '') {[m
+[31m-                    $updates[] = "dataInicio = '$dataInicio'";[m
+[31m-                }[m
+[31m-[m
+[31m-                $query .= implode(", ", $updates) . " WHERE codigo = $codigo ";[m
+[31m-[m
+[31m-                //Prepara os valores para biding[m
+[31m-                $params = [];[m
+[31m-                if ($descricao !== '') {[m
+[31m-                    $params[] = $descricao;[m
+[31m-                }[m
+[31m-                if ($capacidade !== '') {[m
+[31m-                    $params[] = $capacidade;[m
+[31m-                }[m
+[31m-                if ($dataInicio !== '') {[m
+[31m-                    $params[] = $dataInicio;[m
+[31m-                }[m
+[31m-                $params[] = $codigo;[m
+[31m-[m
+[31m-                //Executa a query[m
+[31m-                $this->db->query($query, $params);[m
+[31m-[m
+[31m-                // Verifica se a atualização foi bem sucedida[m
+[31m-                if ($this->db->affected_rows() > 0) {[m
+[31m-                    $dados = array([m
+[31m-                        'codigo' => 1,[m
+[31m-                        'msg' => 'Turma atualizada corretamente.');[m
+[31m-                }else{[m
+[31m-                    $dados = array([m
+[31m-                        'codigo' => 6,[m
+[31m-                        'msg' => 'Houve algum problema na atualização na tabela de turma.');[m
+[31m-                }[m
+[31m-            }else {[m
+[31m-                $dados = array([m
+[31m-                    'codigo' => 5,[m
+[31m-                    'msg' => 'Turma não cadastrada no sistema.');[m
+[31m-            }[m
+[31m-        } catch (Exception $e) {[m
+[31m-            $dados = array([m
+[31m-                'codigo' => 00,[m
+[31m-                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ' . $e->getMessage());[m
+[31m-        }[m
+[31m-        return $dados;[m
+[31m-    }[m
+[31m-[m
+[31m-    public function desativar($codigo){[m
+[31m-        try {[m
+[31m-            // Verifica se a turma já estpa cadastrada[m
+[31m-            $retornoConsulta = $this->consultaTurmaCod($codigo);[m
+[31m-[m
+[31m-            if (is_array($retornoConsulta) && isset($retornoConsulta['codigo']) && $retornoConsulta['codigo'] == 1) {[m
+[31m-                //Query de atualização dos dados[m
+[31m-                $this->db->query("update tbl_turma set estatus = 'D'[m
+[31m-                                    where codigo = $codigo");[m
+[31m-                [m
+[31m-            //Verificar se a atualização ocorreu com sucesso[m
+[31m-            if ($this->db->affected_rows() > 0) {[m
+[31m-                $dados = array([m
+[31m-                    'cdoigo' => 1,[m
+[31m-                    'msg' => 'Turma DESATIVADA corretamente.');[m
+[31m-            }else{[m
+[31m-                $dados = array([m
+[31m-                    'codigo' => 5,[m
+[31m-                    'msg' => 'Houve algum problema na DESATIVAÇÃO da turma');[m
+[31m-            }[m
+[31m-[m
+[31m-        }else {[m
+[31m-            $dados = array([m
+[31m-                'codigo' => 5,[m
+[31m-                'msg' => 'Turma não cadastrada no sistema.');[m
+[31m-        }[m
+[31m-    }catch (Exception $e) {[m
+[31m-        $dados = array([m
+[31m-            'codigo' => 00,[m
+[31m-            'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ', $e->getMessage(), "\n");[m
+[31m-    }[m
+[31m-    //Envia o array $dados com as informações tratadas acima pela estrutura de decisão if[m
+[31m-    return $dados;[m
+[31m-}[m
+[31m-}[m
+[31m-    [m
+[31m-?>[m
+\ No newline at end of file[m
+[1mdiff --git a/assets/endPoints/Insomnia_2025-03-03.json b/assets/endPoints/Insomnia_2025-03-03.json[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7af7150[m
+[1m--- /dev/null[m
+[1m+++ b/assets/endPoints/Insomnia_2025-03-03.json[m
+[36m@@ -0,0 +1 @@[m
+[32m+[m[32m{"_type":"export","__export_format":4,"__export_date":"2025-03-03T19:19:46.337Z","__export_source":"insomnia.desktop.app:v10.3.1","resources":[{"_id":"req_4accbc8750f44477a5ef0c80f8741f7c","parentId":"fld_9d9b19af14a14e9aac1f68f099fddeed","modified":1741028756544,"created":1741027063202,"url":"http://localhost/DSI2/Sala/desativar","name":"desativar","description":"","method":"DELETE","body":{"mimeType":"application/json","text":"{\n\t\"codigo\" : \"1\"\n}"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json"},{"name":"User-Agent","value":"insomnia/10.3.1"}],"authentication":{},"metaSortKey":-1741027063202,"isPrivate":false,"pathParameters":[],"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"fld_9d9b19af14a14e9aac1f68f099fddeed","parentId":"wrk_2a6e735a08c24ed58ff851868a0ca7a4","modified":1740589966420,"created":1740589966420,"name":"Sala","description":"","environment":{},"environmentPropertyOrder":null,"metaSortKey":-1740589966420,"environmentType":"kv","_type":"request_group"},{"_id":"wrk_2a6e735a08c24ed58ff851868a0ca7a4","parentId":null,"modified":1740590262786,"created":1740589950257,"name":"Mapa de Sala - DS II - Fatec São Roque","description":"","scope":"collection","_type":"workspace"},{"_id":"req_e2f51de221664675bc32a84600f4b004","parentId":"fld_9d9b19af14a14e9aac1f68f099fddeed","modified":1741028607313,"created":1741021448678,"url":"http://localhost/DSI2/Sala/alterar","name":"alterar","description":"","method":"PUT","body":{"mimeType":"application/json","text":"{\n\t\"codigo\" : \"1\",\n\t\"descricao\" : \"\",\n\t\"andar\" : \"\",\n\t\"capacidade\" : \"50\"\n}"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json"},{"name":"User-Agent","value":"insomnia/10.3.1"}],"authentication":{},"metaSortKey":-1741021448678,"isPrivate":false,"pathParameters":[],"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"req_718b8f48381346f4aaf0f3d36abda882","parentId":"fld_9d9b19af14a14e9aac1f68f099fddeed","modified":1741029360911,"created":1741020461256,"url":"http://localhost/DSI2/Sala/consultar","name":"consultar","description":"","method":"GET","body":{"mimeType":"application/json","text":"{\n\t\"codigo\" : \"1\",\n\t\"descricao\" : \"\",\n\t\"andar\" : \"\",\n\t\"capacidade\" : \"\",\n\t\"estatus\" : \"\"\n}"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json"},{"name":"User-Agent","value":"insomnia/10.3.1"}],"authentication":{},"metaSortKey":-1741020461256,"isPrivate":false,"pathParameters":[],"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"req_23c7e75a7a9346f6b0421277b3de7bfe","parentId":"fld_9d9b19af14a14e9aac1f68f099fddeed","modified":1741028581152,"created":1740589977450,"url":"http://localhost/DSI2/Sala/inserir","name":"inserir","description":"","method":"POST","body":{"mimeType":"application/json","text":"{\n\t\"codigo\" : \"2\",\n\t\"descricao\" : \"teste\",\n\t\"andar\" : \"1\",\n\t\"capacidade\" : \"50\"\n}"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json"},{"name":"User-Agent","value":"insomnia/10.3.1"}],"authentication":{},"metaSortKey":-1740589977450,"isPrivate":false,"pathParameters":[],"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"env_467689c3ff35d101c1cb1c41991c3a43ef2cdf6c","parentId":"wrk_2a6e735a08c24ed58ff851868a0ca7a4","modified":1740589950260,"created":1740589950260,"name":"Base Environment","data":{},"dataPropertyOrder":null,"color":null,"isPrivate":false,"metaSortKey":1740589950260,"environmentType":"kv","_type":"environment"},{"_id":"jar_467689c3ff35d101c1cb1c41991c3a43ef2cdf6c","parentId":"wrk_2a6e735a08c24ed58ff851868a0ca7a4","modified":1740589950261,"created":1740589950261,"name":"Default Jar","cookies":[],"_type":"cookie_jar"}]}[m
+\ No newline at end of file[m
+[1mdiff --git a/assets/endPoints/turma.json b/assets/endPoints/turma.json[m
+[1mdeleted file mode 100644[m
+[1mindex 2c3d00b..0000000[m
+[1m--- a/assets/endPoints/turma.json[m
+[1m+++ /dev/null[m
+[36m@@ -1 +0,0 @@[m
+[31m-{"_type":"export","__export_format":4,"__export_date":"2025-03-25T03:27:13.308Z","__export_source":"insomnia.desktop.app:v10.3.1","resources":[{"_id":"req_0307180897fa47aa8344f976db6938cd","parentId":"fld_7490e624ba56429ea13f6d8a0f07011f","modified":1742873136924,"created":1742869327564,"url":"http://localhost/DSI2/Turma/inserir","name":"inserir","description":"","method":"POST","body":{"mimeType":"application/json","text":"{\n\t\"descricao\" : \"5º Semestre - SI\",\n\t\"capacidade\" : \"30\",\n\t\"dataInicio\" : \"2023-02-10\"\n}\n"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json"},{"name":"User-Agent","value":"insomnia/10.3.1"}],"authentication":{},"metaSortKey":-1742873066648,"isPrivate":false,"pathParameters":[],"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"fld_7490e624ba56429ea13f6d8a0f07011f","parentId":"wrk_2a6e735a08c24ed58ff851868a0ca7a4","modified":1742870592592,"created":1742869316533,"name":"Turma","description":"","environment":{},"environmentPropertyOrder":null,"metaSortKey":-1742869316733,"environmentType":"kv","_type":"request_group"},{"_id":"wrk_2a6e735a08c24ed58ff851868a0ca7a4","parentId":null,"modified":1740590262786,"created":1740589950257,"name":"Mapa de Sala - DS II - Fatec São Roque","description":"","scope":"collection","_type":"workspace"},{"_id":"req_b15bde5641ab4201a3b23781f36b8ab6","parentId":"fld_7490e624ba56429ea13f6d8a0f07011f","modified":1742873139016,"created":1742869809008,"url":"http://localhost/DSI2/Turma/consultar","name":"consultar","description":"","method":"GET","body":{"mimeType":"application/json","text":"{\n\t\"codigo\" : \"999\",\n\t\"descricao\" : \"\",\n\t\"capacidade\" : \"\",\n\t\"dataInicio\" : \"\"\n}"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json"},{"name":"User-Agent","value":"insomnia/10.3.1"}],"authentication":{},"metaSortKey":-1742873066598,"isPrivate":false,"pathParameters":[],"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"req_12c42977737944c4874c4469ade6abb7","parentId":"fld_7490e624ba56429ea13f6d8a0f07011f","modified":1742873140328,"created":1742870554683,"url":"http://localhost/DSI2/Turma/alterar","name":"alterar","description":"","method":"PUT","body":{"mimeType":"application/json","text":"{\n\t\"codigo\" : \"1\",\n\t\"descricao\" : \"\",\n\t\"capacidade\" : \"55\",\n\t\"dataInicio\" : \"\"\n}"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json"},{"name":"User-Agent","value":"insomnia/10.3.1"}],"authentication":{},"metaSortKey":-1742873066573,"isPrivate":false,"pathParameters":[],"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"req_563bb382c0d44452a12fbf14dcec9818","parentId":"fld_7490e624ba56429ea13f6d8a0f07011f","modified":1742873126041,"created":1742873066548,"url":"http://localhost/DSI2/Turma/desativar","name":"desativar","description":"","method":"DELETE","body":{"mimeType":"application/json","text":"{\n\t\"codigo\" : \"2\"\n}"},"parameters":[],"headers":[{"name":"Content-Type","value":"application/json"},{"name":"User-Agent","value":"insomnia/10.3.1"}],"authentication":{},"metaSortKey":-1742873066548,"isPrivate":false,"pathParameters":[],"settingStoreCookies":true,"settingSendCookies":true,"settingDisableRenderRequestBody":false,"settingEncodeUrl":true,"settingRebuildPath":true,"settingFollowRedirects":"global","_type":"request"},{"_id":"env_467689c3ff35d101c1cb1c41991c3a43ef2cdf6c","parentId":"wrk_2a6e735a08c24ed58ff851868a0ca7a4","modified":1740589950260,"created":1740589950260,"name":"Base Environment","data":{},"dataPropertyOrder":null,"color":null,"isPrivate":false,"metaSortKey":1740589950260,"environmentType":"kv","_type":"environment"},{"_id":"jar_467689c3ff35d101c1cb1c41991c3a43ef2cdf6c","parentId":"wrk_2a6e735a08c24ed58ff851868a0ca7a4","modified":1740589950261,"created":1740589950261,"name":"Default Jar","cookies":[],"_type":"cookie_jar"}]}[m
+\ No newline at end of file[m
