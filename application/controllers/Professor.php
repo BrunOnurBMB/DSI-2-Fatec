@@ -314,3 +314,4 @@ class Professor extends CI_Controller
         echo json_encode($retorno);
     }
 }
+?>
