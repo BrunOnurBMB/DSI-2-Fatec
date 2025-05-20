@@ -294,5 +294,4 @@ class Turma extends CI_Controller {
         echo json_encode($retorno);
     }
 }
-
 ?>
