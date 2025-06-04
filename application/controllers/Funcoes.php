@@ -19,5 +19,9 @@ class Funcoes extends CI_Controller {
     public function abreSala() {
         $this->load->view('sala');
     }
+
+    public function abreProfessor() {
+        $this->load->view('professor');
+    }
 }
 ?>
