@@ -36,23 +36,4 @@ class Funcoes extends CI_Controller
         //Redireciona o usuário para a pagina de login
         header('Location: ' . base_url());
     }
-<<<<<<< HEAD
-
-    public function abreSala() {
-        $this->load->view('sala');
-    }
-
-    public function abreProfessor() {
-        $this->load->view('professor');
-    }
-
-    public function abreTurma() {
-        $this->load->view('turma');
-    }
-
-    public function abrePeriodo() {
-        $this->load->view('periodo');
-    }
-=======
->>>>>>> Bruno
 }
