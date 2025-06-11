@@ -20,7 +20,7 @@ class Funcoes extends CI_Controller
     }
 
     public function abrePeriodo() {
-        $this->load->view('perido');
+        $this->load->view('periodo');
     }
 
     public function abreProfessor() {
