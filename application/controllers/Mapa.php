@@ -1,7 +1,8 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Mapa extends CI_Controller{
+class Mapa extends CI_Controller
+{
 
     //Atributos privados da classe
     private $codigo;
@@ -11,66 +12,116 @@ class Mapa extends CI_Controller{
     private $codigo_turma;
     private $codigo_professor;
     private $estatus;
+    private $dataInicio;
+    private $dataFim;
+    private $diaSemana;
+
 
     //Getters dos atributos
-    public function getCodigo(){
+    public function getCodigo()
+    {
         return $this->codigo;
     }
 
-    public function getDataReserva(){
+    public function getDataReserva()
+    {
         return $this->dataReserva;
     }
 
-    public function getCodigoSala(){
+    public function getCodigoSala()
+    {
         return $this->codigo_sala;
     }
 
-    public function getCodigoHorario(){
+    public function getCodigoHorario()
+    {
         return $this->codigo_horario;
     }
 
-    public function getCodigoTurma(){
+    public function getCodigoTurma()
+    {
         return $this->codigo_turma;
     }
 
-    public function getProfessor(){
+    public function getProfessor()
+    {
         return $this->codigo_professor;
     }
 
-    public function getEstatus(){
+    public function getEstatus()
+    {
         return $this->estatus;
     }
 
+    public function getDataInicio()
+    {
+        return $this->dataInicio;
+    }
+
+    public function getDataFim()
+    {
+        return $this->dataFim;
+    }
+
+    public function getDiaSemana()
+    {
+        return $this->diaSemana;
+    }
+
     //Setters dos atributos
-    public function setCodigo($codigoFront){
+    public function setCodigo($codigoFront)
+    {
         $this->codigo = $codigoFront;
     }
 
-    public function setDataReserva($dataReservaFront){
+    public function setDataReserva($dataReservaFront)
+    {
         $this->dataReserva = $dataReservaFront;
     }
 
-    public function setCodigoSala($codigo_salaFront){
+    public function setCodigoSala($codigo_salaFront)
+    {
         $this->codigo_sala = $codigo_salaFront;
     }
 
-    public function setCodigoHorario($codigo_horarioFront){
+    public function setCodigoHorario($codigo_horarioFront)
+    {
         $this->codigo_horario = $codigo_horarioFront;
     }
 
-    public function setCodigoTurma($codigo_turmaFront){
+    public function setCodigoTurma($codigo_turmaFront)
+    {
         $this->codigo_turma = $codigo_turmaFront;
     }
 
-    public function setProfessor($professorFront){
+    public function setProfessor($professorFront)
+    {
         $this->codigo_professor = $professorFront;
     }
 
-    public function setEstatus($estatusFront){
+    public function setEstatus($estatusFront)
+    {
         $this->estatus = $estatusFront;
     }
 
-    public function inserir(){
+    public function setDataInicio($data)
+    {
+        $this->dataInicio = $data;
+    }
+
+    public function setDataFim($data)
+    {
+        $this->dataFim = $data;
+    }
+
+    public function setDiaSemana($dia)
+    {
+        $this->diaSemana = $dia;
+    }
+
+
+    public function inserir()
+    {
         /*
         Data de reserva, codigo da sala, codigo do horario, codiggo da turma recebidos via JSON e colocados em variáveis.
         Retorno possíveis:
@@ -113,27 +164,27 @@ class Mapa extends CI_Controller{
                         'codigo' => 2,
                         'msg' => 'Data não informada.'
                     );
-                }elseif (trim($this->getCodigoSala()) == '') {
+                } elseif (trim($this->getCodigoSala()) == '') {
                     $retorno = array(
                         'codigo' => 3,
                         'msg' => 'Sala Não informada.'
                     );
-                }elseif (trim($this->getCodigoHorario()) == '') {
+                } elseif (trim($this->getCodigoHorario()) == '') {
                     $retorno = array(
                         'codigo' => 4,
                         'msg' => 'Horário não informado.'
                     );
-                }elseif (trim($this->getCodigoTurma()) == '') {
+                } elseif (trim($this->getCodigoTurma()) == '') {
                     $retorno = array(
                         'codigo' => 5,
                         'msg' => 'Turma não infromada.'
                     );
-                }elseif (trim($this->getProfessor()) == '') {
+                } elseif (trim($this->getProfessor()) == '') {
                     $retorno = array(
                         'codigo' => 6,
                         'msg' => 'Professor não informado.'
                     );
-                }else{
+                } else {
                     //Realizando a intância da Model
                     $this->load->model('M_mapa');
 
@@ -146,7 +197,7 @@ class Mapa extends CI_Controller{
                         $this->getProfessor()
                     );
                 }
-            }else {
+            } else {
                 $retorno = array(
                     'codigo' => 99,
                     'msg' => 'Os camopos vindos do FrontEnd não representam o método de login. verifique'
@@ -164,7 +215,152 @@ class Mapa extends CI_Controller{
         echo json_encode($retorno);
     }
 
-    public function consultar(){
+    public function inserirNovo()
+    {
+        /*
+        Data de reserva, codigo da sala, codigo do horario, codiggo da turma recebidos via JSON e colocados em variáveis.
+        Retorno possíveis:
+        1 - Reserva cadastrada corretamente (Banco)
+        2 - Faltou informar a Data (FrontEnd)
+        3 - Faltou informar a Sala (FrontEnd)
+        4 - Faltou informar o Horário (FrontEnd)
+        5 - Faltou informar a Turma (FrontEnd)
+        6 - Faltou informar o Professro (FrontEnd)
+        7 - Agendamento já cadastrado no sistema
+        8 - Agendamento desativado no sistema
+        9 - Houve algum problema no insert da tabela (Banco)
+        */
+        try {
+            //Dados recebidos via JSON e colocados em atributos
+            $json = file_get_contents('php://input');
+            $resultado = json_decode($json);
+
+            //Array com os dados que deverão vir do Front
+            $lista = array(
+                "codSala" => '0',
+                "codHorario" => '0',
+                "codTurma" => '0',
+                "codProfessor" => '0',
+                "dataInicio" => '0',
+                "dataFim" => '0',
+                "diaSemana" => '0'
+            );
+
+            if (verificarParam($resultado, $lista) == 1) {
+                //Fazendo os setters
+                $this->setCodigoSala($resultado->codSala);
+                $this->setCodigoHorario($resultado->codHorario);
+                $this->setCodigoTurma($resultado->codTurma);
+                $this->setProfessor($resultado->codProfessor);
+                $this->setDataInicio($resultado->dataInicio);
+                $this->setDataFim($resultado->dataFim);
+                $this->setDiaSemana($resultado->diaSemana);
+
+                //Realizando uma validação dos dados para saber se todos foram enviados
+                if (trim($this->getCodigoSala()) == '') {
+                    $retorno = array(
+                        'codigo' => 3,
+                        'msg' => 'Sala não informada.'
+                    );
+                } elseif (trim($this->getCodigoHorario()) == '') {
+                    $retorno = array(
+                        'codigo' => 4,
+                        'msg' => 'Horário não informado.'
+                    );
+                } elseif (trim($this->getCodigoTurma()) == '') {
+                    $retorno = array(
+                        'codigo' => 5,
+                        'msg' => 'Turma não informada.'
+                    );
+                } elseif (trim($this->getProfessor()) == '') {
+                    $retorno = array(
+                        'codigo' => 6,
+                        'msg' => 'Professor não informado.'
+                    );
+                } else {
+                    //Realizando a intância da Model
+                    $this->load->model('M_mapa');
+
+                    //Atributo $retorno recebe array com informações da validação do acesso
+                    $retorno = $this->M_mapa->inserirNovo(
+                        $this->getCodigoSala(),
+                        $this->getCodigoHorario(),
+                        $this->getCodigoTurma(),
+                        $this->getProfessor(),
+                        $this->getDataInicio(),
+                        $this->getDataFim(),
+                        $this->getDiaSemana()
+                    );
+                }
+            } else {
+                $retorno = array(
+                    'codigo' => 99,
+                    'msg' => 'Os campos vindos do FrontEnd não representam o método de login. Verifique.'
+                );
+            }
+        } catch (Exception $e) {
+            $retorno = array(
+                'codigo' => 0,
+                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
+                $e->getMessage()
+            );
+        }
+        //Retorno no formato JSON
+        echo json_encode($retorno);
+    }
+
+    public function desativarMultiplos()
+    {
+        try {
+            // Recebe os codigos via JSON
+            $json = file_get_contents('php://input');
+            $resultado = json_decode($json);
+
+            //Verifica se os codigos foram recebidos e são validos
+            if (!isset($resultado->codigos) || empty($resultado->codigos) || !is_array($resultado->codigos)) {
+                $retorno = array(
+                    'codigo' => 2,
+                    'msg' => 'Nenhum código de reserva informado.'
+                );
+            } else {
+                $codigos = $resultado->codigos; //Array de códigos
+                //Realizando a intância da Model
+                $this->load->model('M_mapa');
+
+                $sucesso = true;
+                foreach ($codigos as $codigo) {
+                    $retorno = $this->M_mapa->desativar($codigo); // Chama a model para cada código
+                    if ($retorno['codigo'] != 1) {
+                        $sucesso = false;
+                        break; // Se algum código falhar, interrompe o loop
+                    }
+                }
+
+                if ($sucesso) {
+                    $retorno = array(
+                        'codigo' => 1,
+                        'msg' => 'Mapeamentos desativados com sucesso.'
+                    );
+                } else {
+                    $retorno = array(
+                        'codigo' => 5,
+                        'msg' => 'Houve um problema ao desativar as reservas.'
+                    );
+                }
+            }
+        } catch (Exception $e) {
+            $retorno = array(
+                'codigo' => 0,
+                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
+                $e->getMessage()
+            );
+        }
+        //Retorno no formato JSON
+        echo json_encode($retorno);
+    }
+
+    public function consultar()
+    {
         /*
         Código, Data de resrva, código da sala, código do horário e codigo da turma recebidos via JSON e colocados em variáveis
         Retornos possiveis:
@@ -206,7 +402,7 @@ class Mapa extends CI_Controller{
                     $this->getCodigoTurma(),
                     $this->getProfessor()
                 );
-            } else{
+            } else {
                 $retorno = array(
                     'codigo' => 99,
                     'msg' => 'Os campos vindos do FrontEnd não representam o método de login. Verifique.'
@@ -215,14 +411,15 @@ class Mapa extends CI_Controller{
         } catch (Exception $e) {
             $retorno = array(
                 'codigo' => 0,
-                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ', 
+                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
                 $e->getMessage()
             );
         }
         echo json_encode($retorno);
     }
 
-    public function alterar(){
+    public function alterar()
+    {
         /*
         Código, Data de reserva, código da sala, código do horário e código da turma recebidos via JSON e colocados em variáveis
         Retorno possíveis:
@@ -267,27 +464,27 @@ class Mapa extends CI_Controller{
                         'codigo' => 2,
                         'msg' => 'Código não informado.'
                     );
-                }elseif (trim($this->getDataReserva()) == '') {
+                } elseif (trim($this->getDataReserva()) == '') {
                     $retorno = array(
                         'codigo' => 3,
                         'msg' => 'Data não informada.'
                     );
-                }elseif (trim($this->getCodigoSala()) == '') {
+                } elseif (trim($this->getCodigoSala()) == '') {
                     $retorno = array(
                         'codigo' => 4,
                         'msg' => 'Sala Não informada.'
                     );
-                }elseif (trim($this->getCodigoHorario()) == '') {
+                } elseif (trim($this->getCodigoHorario()) == '') {
                     $retorno = array(
                         'codigo' => 5,
                         'msg' => 'Horário não informado.'
                     );
-                }elseif (trim($this->getCodigoTurma()) == '') {
+                } elseif (trim($this->getCodigoTurma()) == '') {
                     $retorno = array(
                         'codigo' => 6,
                         'msg' => 'Turma não infromada.'
                     );
-                }elseif (trim($this->getProfessor()) == '') {
+                } elseif (trim($this->getProfessor()) == '') {
                     $retorno = array(
                         'codigo' => 7,
                         'msg' => 'Professor não informado.'
@@ -322,7 +519,8 @@ class Mapa extends CI_Controller{
         echo json_encode($retorno);
     }
 
-    public function desativar(){
+    public function desativar()
+    {
         /*
         Usuário recebido via JSON e colocado em variável
         Retornos possíveis:
@@ -341,7 +539,7 @@ class Mapa extends CI_Controller{
             );
 
             if (verificarParam($resultado, $lista) == 1) {
-                
+
                 $json = file_get_contents('php://input');
                 $resultado = json_decode($json);
 
@@ -350,7 +548,7 @@ class Mapa extends CI_Controller{
                 //Validando o dados recebido que não deverá ser em branco
                 if (trim($this->getCodigo()) == '') {
                     $retorno = array(
-                        'codigo' =>  2,
+                        'codigo' => 2,
                         'msg' => 'Código do agendamento não informado.'
                     );
                 } else {
@@ -361,10 +559,10 @@ class Mapa extends CI_Controller{
                     $retorno = $this->M_mapa->desativar($this->getCodigo());
                 }
             } else {
-              $retorno = array(
-                'codigo' => 99,
-                'msg' => 'Os campos vindos do FrontEnd não representam o método de login. Verifique'
-              );  
+                $retorno = array(
+                    'codigo' => 99,
+                    'msg' => 'Os campos vindos do FrontEnd não representam o método de login. Verifique'
+                );
             }
         } catch (Exception $e) {
             $retorno = array(

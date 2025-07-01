@@ -1,34 +1,41 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class M_turma extends CI_Model{
-    public function inserir($descricao, $capacidade, $dataInicio){
+class M_turma extends CI_Model
+{
+    public function inserir($descricao, $capacidade, $dataInicio)
+    {
         try {
             //Querry de inserção  dos dados
             $this->db->query("insert into tbl_turma (descricao, capacidade, dataInicio) 
                                 values ('$descricao', '$capacidade', '$dataInicio')");
-            
-                                //Verificar se a inserção ocorreu com sucesso
+
+            //Verificar se a inserção ocorreu com sucesso
             if ($this->db->affected_rows() > 0) {
                 $dados = array(
                     'codigo' => 1,
-                    'msg' => 'Turma cadastrada corretamente.');
-            }else{
+                    'msg' => 'Turma cadastrada corretamente.'
+                );
+            } else {
                 $dados = array(
                     'codigo' => 6,
-                    'msg' => 'Houve algum problema na inserção de dados na tabela de turma.');
+                    'msg' => 'Houve algum problema na inserção de dados na tabela de turma.'
+                );
             }
         } catch (Exception $e) {
             $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÃO: o seguinte erro aconteceu -> ',
-                $e->getMessage(), "\n");
+                $e->getMessage(),
+                "\n"
+            );
         }
         //Envia o array $dados com as informações tratadas acima pela estrutura de decisão if
         return $dados;
     }
 
-    public function consultar($codigo, $descricao, $capacidade, $dataInicio){
+    public function consultar($codigo, $descricao, $capacidade, $dataInicio)
+    {
         try {
             //Querry para consultar dados de acordo com parâmetros passados
             $sql = "select codigo, descricao, capacidade, dataInicio, 
@@ -57,8 +64,9 @@ class M_turma extends CI_Model{
                 $dados = array(
                     'codigo' => 1,
                     'msg' => 'Consulta efetuada com sucesso',
-                    'dados' => $retorno->result());
-            }else{
+                    'dados' => $retorno->result()
+                );
+            } else {
                 $dados = array(
                     'codigo' => 6,
                     'msg' => 'Turma não encontrada.'
@@ -68,13 +76,16 @@ class M_turma extends CI_Model{
             $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
-                $e->getMessage(), "\n");
+                $e->getMessage(),
+                "\n"
+            );
         }
         //Envia o array $dados com as informações tratadas acima pela estrutuda de decisão if
         return $dados;
     }
 
-    public function consultaTurmaCod($codigo){
+    public function consultaTurmaCod($codigo)
+    {
         try {
             //Query para consultar dados de acordo com parâmetros passados
             $sql = "select * from tbl_turma where codigo = $codigo  and estatus = ''";
@@ -85,23 +96,28 @@ class M_turma extends CI_Model{
             if ($retornoSala->num_rows() > 0) {
                 $dados = array(
                     'codigo' => 1,
-                    'msg' => 'Consulta efetuada com sucesso.');
-            }else{
+                    'msg' => 'Consulta efetuada com sucesso.'
+                );
+            } else {
                 $dados = array(
                     'codigo' => 6,
-                    'msg' => 'Turma não encontrada.');
+                    'msg' => 'Turma não encontrada.'
+                );
             }
         } catch (Exception $e) {
             $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
-                $e->getMessage(), "\n");
+                $e->getMessage(),
+                "\n"
+            );
         }
         //Envia o array $dados com as informações tratadas acima pela estrutura de decisão if
         return $dados;
     }
 
-    public function alterar($codigo, $descricao, $capacidade, $dataInicio){
+    public function alterar($codigo, $descricao, $capacidade, $dataInicio)
+    {
         try {
             //verifica se a turma já está cadastrada
             $retornoConsulta = $this->consultaTurmaCod($codigo);
@@ -144,26 +160,31 @@ class M_turma extends CI_Model{
                 if ($this->db->affected_rows() > 0) {
                     $dados = array(
                         'codigo' => 1,
-                        'msg' => 'Turma atualizada corretamente.');
-                }else{
+                        'msg' => 'Turma atualizada corretamente.'
+                    );
+                } else {
                     $dados = array(
                         'codigo' => 6,
-                        'msg' => 'Houve algum problema na atualização na tabela de turma.');
+                        'msg' => 'Houve algum problema na atualização na tabela de turma.'
+                    );
                 }
-            }else {
+            } else {
                 $dados = array(
                     'codigo' => 5,
-                    'msg' => 'Turma não cadastrada no sistema.');
+                    'msg' => 'Turma não cadastrada no sistema.'
+                );
             }
         } catch (Exception $e) {
             $dados = array(
                 'codigo' => 00,
-                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ' . $e->getMessage());
+                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ' . $e->getMessage()
+            );
         }
         return $dados;
     }
 
-    public function desativar($codigo){
+    public function desativar($codigo)
+    {
         try {
             // Verifica se a turma já estpa cadastrada
             $retornoConsulta = $this->consultaTurmaCod($codigo);
@@ -172,31 +193,67 @@ class M_turma extends CI_Model{
                 //Query de atualização dos dados
                 $this->db->query("update tbl_turma set estatus = 'D'
                                     where codigo = $codigo");
-                
-            //Verificar se a atualização ocorreu com sucesso
-            if ($this->db->affected_rows() > 0) {
-                $dados = array(
-                    'cdoigo' => 1,
-                    'msg' => 'Turma DESATIVADA corretamente.');
-            }else{
+
+                //Verificar se a atualização ocorreu com sucesso
+                if ($this->db->affected_rows() > 0) {
+                    $dados = array(
+                        'cdoigo' => 1,
+                        'msg' => 'Turma DESATIVADA corretamente.'
+                    );
+                } else {
+                    $dados = array(
+                        'codigo' => 5,
+                        'msg' => 'Houve algum problema na DESATIVAÇÃO da turma'
+                    );
+                }
+
+            } else {
                 $dados = array(
                     'codigo' => 5,
-                    'msg' => 'Houve algum problema na DESATIVAÇÃO da turma');
+                    'msg' => 'Turma não cadastrada no sistema.'
+                );
             }
-
-        }else {
+        } catch (Exception $e) {
             $dados = array(
-                'codigo' => 5,
-                'msg' => 'Turma não cadastrada no sistema.');
+                'codigo' => 00,
+                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
+                $e->getMessage(),
+                "\n"
+            );
         }
-    }catch (Exception $e) {
-        $dados = array(
-            'codigo' => 00,
-            'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ', $e->getMessage(), "\n");
+        //Envia o array $dados com as informações tratadas acima pela estrutura de decisão if
+        return $dados;
     }
-    //Envia o array $dados com as informações tratadas acima pela estrutura de decisão if
-    return $dados;
+
+    public function listarTodos()
+    {
+        try {
+            //Query para consultar dados de acordo com parâmetros passados
+            $sql = "select * from tbl_turma where estatus = ''
+                    order by codigo";
+            $retorno = $this->db->query($sql);
+
+            //Verificar se a consulta ocorreu com sucesso
+            if ($retorno->num_rows() > 0) {
+                $dados = array(
+                    'codigo' => 1,
+                    'msg' => 'Consulta efetuada com sucesso.',
+                    'dados' => $retorno->result()
+                );
+            } else {
+                $dados = array(
+                    'codigo' => 6,
+                    'msg' => 'Turma não encontrada'
+                );
+            }
+        } catch (Exception $e) {
+            $dados = array(
+                'codigo' => 00,
+                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ' . $e->getMessage()
+            );
+        }
+        return $dados; // Retorna um array de objetos
+    }
 }
-}
-    
+
 ?>

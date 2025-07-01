@@ -293,5 +293,20 @@ class Turma extends CI_Controller {
         //Retorno no formato JSON
         echo json_encode($retorno);
     }
+
+    public function listar(){
+        // Função para listar os horários no Front sem necessidade de parâmentros
+        try {
+            $this->load->model('M_turma');
+            
+            //Chama o método para buscar todas as turmas
+            $retorno = $this->M_turma->listarTodos();
+        } catch (Exception $e) {
+            $retorno = array(
+                'codigo' => 0,
+                'msg' => 'Erro ao listar os horarios: ' . $e.getMessage());
+        }
+        echo json_encode($retorno);
+    }
 }
 ?>

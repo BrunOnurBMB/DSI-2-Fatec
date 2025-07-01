@@ -249,5 +249,34 @@ class M_horario extends CI_Model {
         //Enviando o array com as informações tratadas acima pela estrutuda de decisão if
         return $dados;
     }
+
+    public function listarTodos(){
+        try {
+            //Query para consultar dados de acordo com parâmetros passados
+            $sql = "select * from tbl_horario where estatus = ''
+                    order by codigo";
+            $retorno = $this->db->query($sql);
+
+            //Verificar se a consulta ocorreu com sucesso
+            if ($retorno->num_rows() > 0) {
+                $dados = array(
+                    'codigo' => 1,
+                    'msg' => 'Consulta efetuada com sucesso.',
+                    'dados' => $retorno->result()
+                );
+            } else {
+                $dados = array(
+                    'codigo' => 6,
+                    'msg' => 'Horário não encontrado'
+                );
+            }
+        } catch (Exception $e) {
+            $dados = array(
+                'codigo' => 00,
+                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ' . $e->getMessage()
+            );
+        }
+        return $dados; // Retorna um array de objetos
+    }
 }
 ?>

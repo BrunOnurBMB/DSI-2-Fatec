@@ -7,16 +7,23 @@ include_once("M_horario.php");
 include_once("M_turma.php");
 include_once("M_professor.php");
 
-class M_mapa extends CI_Model{
+class M_mapa extends CI_Model
+{
 
-    public function inserir($dataReserva, $codSala, $codHorario, $codTurma, $codProfessor){
+    public function inserir($dataReserva, $codSala, $codHorario, $codTurma, $codProfessor)
+    {
         try {
             //Verificando se o professor já está cadastrado
-            $retornoConsulta = $this->consultaReservaTotal($dataReserva, $codSala, $codHorario,
-                                                           $codTurma,  $codProfessor);
-            
+            $retornoConsulta = $this->consultaReservaTotal(
+                $dataReserva,
+                $codSala,
+                $codHorario,
+                $codTurma,
+                $codProfessor
+            );
+
             if ($retornoConsulta['codigo'] == 6 || $retornoConsulta['codigo'] == 7) {
-                
+
                 //Chamando o objeto sala para validação
                 $salaObj = new M_sala();
 
@@ -49,8 +56,8 @@ class M_mapa extends CI_Model{
                                 $this->db->query("insert into tbl_mapa (datareserva, sala, codigo_horario,
                                                  codigo_turma, codigo_professor)
                                                  values ('" . $dataReserva . "', $codSala, $codHorario, $codTurma, $codProfessor)");
-                            
-                             //verificando se a inseerção ocorreu com sucesso
+
+                                //verificando se a inseerção ocorreu com sucesso
                                 if ($this->db->affected_rows() > 0) {
                                     $dados = array(
                                         'codigo' => 1,
@@ -73,7 +80,7 @@ class M_mapa extends CI_Model{
                                 'codigo' => $retornoConsultaTurma['codigo'],
                                 'msg' => $retornoConsultaTurma['msg']
                             );
-                        }                     
+                        }
                     } else {
                         $dados = array(
                             'codigo' => $$retornoConsultaHorario['codigo'],
@@ -88,21 +95,116 @@ class M_mapa extends CI_Model{
                 }
             } else {
                 $dados = array(
-                'cdoigo' => 7,
-                'msg' => 'Agendamento já cadastradono sistema.');
+                    'cdoigo' => 7,
+                    'msg' => 'Agendamento já cadastradono sistema.'
+                );
             }
         } catch (Exception $e) {
             $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
-                $e->getMessage(), "\n"
+                $e->getMessage(),
+                "\n"
             );
         }
         //Enviando o array $dados com as informações tratadas acima pela estrutura de decisão if
         return $dados;
     }
 
-    private function consultaReservaTotal($dataReserva, $codSala, $codHorario){
+    public function inserirNovo($codSala, $codHorario, $codTurma, $codProfessor, $dataInicio, $dataFim, $diaSemana)
+    {
+        try {
+            $salaObj = new M_sala();
+            $retornoConsultaSala = $salaObj->consultar($codSala, '', '', '');
+
+            if ($retornoConsultaSala['codigo'] == 1) {
+                $horarioObj = new M_horario();
+                $retornoConsultaHorario = $horarioObj->consultaHorarioCod($codHorario);
+                if ($retornoConsultaHorario['codigo'] == 1) {
+                    $turmaObj = new M_turma();
+                    $retornoConsultaTurma = $turmaObj->consultaTurmaCod($codTurma);
+                    if ($retornoConsultaTurma['codigo'] == 1) {
+                        $professorObj = new M_professor();
+                        $retornoConsultaProfessor = $professorObj->consultaProfessorCod($codProfessor);
+                        if ($retornoConsultaProfessor['codigo'] == 1) {
+                            $datasCorrespondentes = [];
+                            $datasFora = [];
+
+                            for ($i = 0; $i < count($diaSemana); $i++) {
+                                for ($dataAtual = strtotime($dataInicio); $dataAtual <= strtotime($dataFim); $dataAtual = strtotime("+1 day", $dataAtual)) {
+                                    $retornoConsulta = $this->consultaReservaTotal(date('Y-m-d', $dataAtual), $codSala, $codHorario);
+
+                                    if ($retornoConsulta['codigo'] == 1 || $retornoConsulta['codigo'] == 7) {
+                                        if (isset($retornoConsulta['status']) && $retornoConsulta['status'] == 'D') {
+                                            if (date("w", $dataAtual) == $diaSemana[$i]) {
+                                                $datasCorrespondentes[] = date('Y-m-d', $dataAtual);
+                                            }
+                                        } else {
+                                            $datasFora[] = date('Y-m-d', $dataAtual) . ", ";
+                                        }
+                                    } else {
+                                        if (date("w", $dataAtual) == $diaSemana[$i]) {
+                                            $datasCorrespondentes[] = date('Y-m-d', $dataAtual);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (!empty($datasCorrespondentes)) {
+                                foreach ($datasCorrespondentes as $data) {
+                                    $this->db->query("insert into tbl_mapa (datareserva, sala, codigo_horario,
+                                                     codigo_turma, codigo_professor)
+                                                     values ('" . $data . "', $codSala, $codHorario, $codTurma, $codProfessor)");
+                                }
+
+                                if ($this->db->affected_rows() > 0) {
+                                    $dados = array(
+                                        'codigo' => 1,
+                                        'msg' => !empty($datasFora) ? 'Agendamento cadastrado corretamente, porém a(s) daras(s) ' . substr(join($datasFora), 0, -2) . ' já possuem agendamentos.' : 'Agendamento cadastrado corretamente.'
+                                    );
+                                }
+                            } else {
+                                $dados = array(
+                                    'codigo' => empty($datasFora) ? 8 : 15,
+                                    'msg' => empty($datasFora) ? 'Estas datas de agentamento já constam no sistema.' : 'As datas ' . substr(join($datasFora), 0, -2) . ' já possuem agendamentos e não podem ser incluidas.'
+                                );
+                            }
+                        }else {
+                            $dados = array(
+                                'codigo' => $retornoConsultaProfessor['codigo'],
+                                'msg' => $retornoConsultaProfessor['msg']
+                            );
+                        }
+                    }else {
+                        $dados = array(
+                            'codigo' => $retornoConsultaTurma['codigo'],
+                            'msg' => $retornoConsultaTurma['msg']
+                        );
+                    }
+                }else {
+                    $dados = array(
+                        'codigo' => $retornoConsultaHorario['codigo'],
+                         'msg' => $retornoConsultaHorario['msg']);
+                }
+            }else {
+                $dados = array(
+                    'codigo' => $retornoConsultaSala['codigo'],
+                    'msg' => $retornoConsultaSala['msg']
+                );
+            }
+        } catch (Exception $e) {
+            $dados = array(
+                'codigo' => 0,
+                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
+                $e->getMessage(),
+                "\n"
+            );
+        }
+        return $dados;
+    }
+
+    private function consultaReservaTotal($dataReserva, $codSala, $codHorario)
+    {
         try {
             //Query oara verificar a hora inicial e final daquele determinado horário
             $sql = "select * from tbl_horario 
@@ -122,15 +224,15 @@ class M_mapa extends CI_Model{
                             and m.codigo_horario = h.codigo 
                             and (h.hora_fim >= '" . $horaInicial . "' 
                             and h.hora_ini <= '" . $horaFinal . "')";
-            $retornoMapa = $this->db->query($sql);
+                $retornoMapa = $this->db->query($sql);
 
                 //Verificando se a consulta ocorreu com sucesso
                 if ($retornoMapa->num_rows() > 0) {
                     $linha = $retornoMapa->row();
-                    
+
                     if (trim($linha->estatus) == "D") {
                         $dados = array(
-                            'cdoigo' => 7,
+                            'codigo' => 7,
                             'msg' => 'Agendamento desativado no sistema.'
                         );
                     } else {
@@ -147,7 +249,7 @@ class M_mapa extends CI_Model{
                 }
             }
         } catch (Exception $e) {
-            $dadoos = array(
+            $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÃO: O seguinte erro aconteceu  -> ',
                 $e->getMessage(),
@@ -158,7 +260,8 @@ class M_mapa extends CI_Model{
         return $dados;
     }
 
-    public function consultar($codigo, $dataReserva, $codSala, $codHorario, $codTurma, $codProfessor){
+    public function consultar($codigo, $dataReserva, $codSala, $codHorario, $codTurma, $codProfessor)
+    {
         try {
             //Query para consultar dados de acrodo com parâmetros passados
             $sql = "select m.codigo, date_format(m.datareserva, '%d-%m-%Y') datareservabra, datareserva,
@@ -216,15 +319,17 @@ class M_mapa extends CI_Model{
         } catch (Exception $e) {
             $dados = array(
                 'codigo' => 00,
-                'msg' => 'ATENSÇÃO: O seguinte erro aconteceu -> ', 
-                $e->getMessage(), "\n"
+                'msg' => 'ATENSÇÃO: O seguinte erro aconteceu -> ',
+                $e->getMessage(),
+                "\n"
             );
         }
         //Enviando o array $dados com as informações tratadas pela estrutura de decisão if
         return $dados;
     }
 
-    public function alterar($codigo, $dataReserva, $codSala, $codHorario, $codTurma, $codProfessor){
+    public function alterar($codigo, $dataReserva, $codSala, $codHorario, $codTurma, $codProfessor)
+    {
         try {
             //Varificando se o professor já está cadastrado
             $retornoConsultaCodigo = $this->consultar($codigo, "", "", "", "", "");
@@ -332,20 +437,22 @@ class M_mapa extends CI_Model{
             $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÂO: O seguinte erro aconteceu -> ',
-                $e->getMessage(), "\n"
+                $e->getMessage(),
+                "\n"
             );
         }
         //Enviando o array $dados com as informações tratados pela estrutura de decisão if
         return $dados;
     }
 
-    public function desativar($codigo){
+    public function desativar($codigo)
+    {
         try {
             //Verificando se o agendamento já está cadastrado
             $retornoConsulta = $this->consultar($codigo, "", "", "", "", "");
 
             if ($retornoConsulta['codigo'] == 1) {
-                
+
                 //Query de atualização dos dados
                 $this->db->query("delete from tbl_mapa 
                                  where codigo = $codigo");
@@ -372,7 +479,8 @@ class M_mapa extends CI_Model{
             $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÂO: O seguinte erro aconteceu -> ',
-                $e->getMessage(), "\n"
+                $e->getMessage(),
+                "\n"
             );
         }
         //Enviando o array $dados com as informações tratadas acima pela estrutura de decisão if

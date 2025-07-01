@@ -31,6 +31,14 @@ class Funcoes extends CI_Controller
         $this->load->view('turma');
     }
 
+    public function abreMapa() {
+        $this->load->view('mapa');
+    }
+
+    public function abreRelatorio() {
+        $this->load->view('relatorio');
+    }
+
     public function encerraSistema()
     {
         //Redireciona o usuário para a pagina de login

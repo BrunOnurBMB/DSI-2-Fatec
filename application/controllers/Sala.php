@@ -1,7 +1,8 @@
 <?php
-defined('BASEPATH') OR exit ('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Sala extends CI_Controller{
+class Sala extends CI_Controller
+{
 
     //Atributos privados da classe
     private $codigo;
@@ -11,48 +12,59 @@ class Sala extends CI_Controller{
     private $estatus;
 
     // Getters dos atributos
-    public function getCodigo(){
+    public function getCodigo()
+    {
         return $this->codigo;
     }
 
-    public function getDescricao(){
+    public function getDescricao()
+    {
         return $this->descricao;
     }
 
-    public function getAndar(){
+    public function getAndar()
+    {
         return $this->andar;
     }
 
-    public function getCapacidade(){
+    public function getCapacidade()
+    {
         return $this->capacidade;
     }
 
-    public function getEstatus(){
+    public function getEstatus()
+    {
         return $this->estatus;
     }
 
     // Setters dos atributos
-    public function setCodigo($codigoFront){
+    public function setCodigo($codigoFront)
+    {
         $this->codigo = $codigoFront;
     }
 
-    public function setDescricao($descricaoFront){
+    public function setDescricao($descricaoFront)
+    {
         $this->descricao = $descricaoFront;
     }
 
-    public function setAndar($andarFront){
+    public function setAndar($andarFront)
+    {
         $this->andar = $andarFront;
     }
 
-    public function setCapacidade($capacidadeFront){
+    public function setCapacidade($capacidadeFront)
+    {
         $this->capacidade = $capacidadeFront;
     }
 
-    public function setEstatus($estatusFront){
+    public function setEstatus($estatusFront)
+    {
         $this->estatus = $estatusFront;
     }
 
-    public function inserir(){
+    public function inserir()
+    {
         /* codigo, descrição e andar
            Recebidos via JSON e colocados em variáveis
            Retornos possíveis:
@@ -77,7 +89,7 @@ class Sala extends CI_Controller{
                 "capacidade" => '0'
             );
 
-            if(verificarParam($resultado, $lista) == 1){
+            if (verificarParam($resultado, $lista) == 1) {
                 //fazendo os setters
                 $this->setCodigo($resultado->codigo);
                 $this->setDescricao($resultado->descricao);
@@ -85,43 +97,58 @@ class Sala extends CI_Controller{
                 $this->setCapacidade($resultado->capacidade);
 
                 // validação para verificar se todos os dados foram enviados
-                if(trim($this->getCodigo()) == '' || $this->getCodigo() == 0){
-                    $retorno = array('codigo' => 2,
-                                     'msg' => 'Código não informado.');
-                }elseif(trim($this->getDescricao()) == ''){
-                    $retorno = array('codigo' => 3,
-                                     'msg' => 'Descrição não informada.');
-                }elseif(trim($this->getAndar()) == '' || trim($this->getAndar()) == 0){
-                    $retorno = array('codigo' => 4,
-                                     'msg' => 'Andar não informado.');
-                }elseif (trim($this->getCapacidade()) == '' || trim($this->getCapacidade()) == 0){
-                    $retorno = array('codigo' => 5,
-                                     'msg' => 'Capacidade não informada.');
-                }else{
+                if (trim($this->getCodigo()) == '' || $this->getCodigo() == 0) {
+                    $retorno = array(
+                        'codigo' => 2,
+                        'msg' => 'Código não informado.'
+                    );
+                } elseif (trim($this->getDescricao()) == '') {
+                    $retorno = array(
+                        'codigo' => 3,
+                        'msg' => 'Descrição não informada.'
+                    );
+                } elseif (trim($this->getAndar()) == '' || trim($this->getAndar()) == 0) {
+                    $retorno = array(
+                        'codigo' => 4,
+                        'msg' => 'Andar não informado.'
+                    );
+                } elseif (trim($this->getCapacidade()) == '' || trim($this->getCapacidade()) == 0) {
+                    $retorno = array(
+                        'codigo' => 5,
+                        'msg' => 'Capacidade não informada.'
+                    );
+                } else {
                     // Realizando a instância da Model
                     $this->load->model('M_sala');
 
                     // atributo $retorno recebe array com informações da validação de acesso
-                    $retorno = $this->M_sala->inserir($this->getCodigo(), $this->getDescricao(),
-                                                      $this->getAndar(), $this->getCapacidade());
+                    $retorno = $this->M_sala->inserir(
+                        $this->getCodigo(),
+                        $this->getDescricao(),
+                        $this->getAndar(),
+                        $this->getCapacidade()
+                    );
                 }
-            }else{
+            } else {
                 $retorno = array(
                     'codigo' => 99,
-                    'msg' => 'os campos vindos do FrontEnd não representam o médotodo de Inersção, verifique.');
+                    'msg' => 'os campos vindos do FrontEnd não representam o médotodo de Inersção, verifique.'
+                );
             }
         } catch (Exception $e) {
             $retorno = array(
                 'codigo' => 0,
                 'msg' => 'ATENÇÃO: O seguinte erro aconteceu ->',
-                $e->getMessage());
+                $e->getMessage()
+            );
         }
 
         //Retorno no dromato JSON
         echo json_encode($retorno);
     }
 
-    public function consultar(){
+    public function consultar()
+    {
         //Codigo, descrição e tipi (Adm ou comum)
         //Recebidos via JSON e colocados em variáveis.
         //Retornos possíveis:
@@ -150,26 +177,31 @@ class Sala extends CI_Controller{
                 $this->load->model('M_sala');
 
                 //Atributo $retorno recebe array com informações da consulta dos dados
-                $retorno = $this->M_sala->consultar($this->getCodigo(),
-                                                    $this->getDescricao(),
-                                                    $this->getAndar(),
-                                                    $this->getCapacidade());
-            }else{
+                $retorno = $this->M_sala->consultar(
+                    $this->getCodigo(),
+                    $this->getDescricao(),
+                    $this->getAndar(),
+                    $this->getCapacidade()
+                );
+            } else {
                 $retorno = array(
                     'codigo' => 99,
-                    'msg' => 'Os campos vindos do FrontEnd não representam o método de Consulta. Verifique.');
+                    'msg' => 'Os campos vindos do FrontEnd não representam o método de Consulta. Verifique.'
+                );
             }
         } catch (Exception $e) {
             $retorno = array(
                 'codigo' => 0,
                 'msg' => 'Atenção o seguinte erro aconteceu -> ',
-                $e=>getMessage());
+                $e => getMessage()
+            );
         }
         //Retorno no formato JSON
         echo json_encode($retorno);
     }
 
-    public function alterar(){
+    public function alterar()
+    {
         /* Codigo descrição e andar
            Recebidos via jSON e colocados em variáveis
            Retornos possiveis:
@@ -190,7 +222,7 @@ class Sala extends CI_Controller{
                 "capacidade" => '0'
             );
 
-            if(verificarParam($resultado, $lista) == 1){
+            if (verificarParam($resultado, $lista) == 1) {
                 //fazendo setters
                 $this->setCodigo($resultado->codigo);
                 $this->setDescricao($resultado->descricao);
@@ -201,38 +233,49 @@ class Sala extends CI_Controller{
                 if (trim($this->getCodigo() == '')) {
                     $retorno = array(
                         'codigo' => 2,
-                        'msg' => 'Código não informado');
+                        'msg' => 'Código não informado'
+                    );
 
-                // Descrição, andar ou capacidade, pelo menos 1 deles precisa ser infromado.
-                }elseif (trim($this->getDescricao()) == '' && trim($this->getAndar()) == '' && 
-                trim($this->getCapacidade()) == '') {
+                    // Descrição, andar ou capacidade, pelo menos 1 deles precisa ser infromado.
+                } elseif (
+                    trim($this->getDescricao()) == '' && trim($this->getAndar()) == '' &&
+                    trim($this->getCapacidade()) == ''
+                ) {
                     $retorno = array(
                         'codigo' => 3,
-                        'msg' => 'Pelo menos um parâmetro precisa ser passado para atualização');
-                }else {
+                        'msg' => 'Pelo menos um parâmetro precisa ser passado para atualização'
+                    );
+                } else {
                     //Realizandoa a instãncia da Model
                     $this->load->model('M_sala');
 
                     //Atributo $retorno recebe array com inftomações da alteração dos dados
-                    $retorno = $this->M_sala->alterar($this->getCodigo(), $this->getDescricao(),
-                                                      $this->getAndar(), $this->getCapacidade());
+                    $retorno = $this->M_sala->alterar(
+                        $this->getCodigo(),
+                        $this->getDescricao(),
+                        $this->getAndar(),
+                        $this->getCapacidade()
+                    );
                 }
-            }else {
+            } else {
                 $retorno = array(
                     'codigo' => 99,
-                    'msg' => 'Os campos vindos do FrontEnd não representam o método de alteração. Verifique.');
+                    'msg' => 'Os campos vindos do FrontEnd não representam o método de alteração. Verifique.'
+                );
             }
         } catch (Exception $e) {
             $retorno = array(
                 'codigo' => 0,
                 'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
-                $e->getMessege());
+                $e->getMessege()
+            );
         }
         //Retorno no formato JSON
         echo json_encode($retorno);
     }
 
-    public function desativar(){
+    public function desativar()
+    {
         /*  Usuário recebido via JSON e colocado em variável
             Retornos possíveis:
             1 - Sala desativada corretamente (Banco)
@@ -260,27 +303,47 @@ class Sala extends CI_Controller{
                 if (trim($this->getCodigo()) == '') {
                     $retorno = array(
                         'codigo' => 2,
-                        'msg' => 'Código não informado');
-                }else {
+                        'msg' => 'Código não informado'
+                    );
+                } else {
                     //Realiza a instância da Model
                     $this->load->model('M_sala');
 
                     //Atributo $retorno recebe array com informações
                     $retorno = $this->M_sala->desativar($this->getCodigo());
                 }
-            }else {
+            } else {
                 $retorno = array(
                     'codigo' => 99,
-                    'msg' => 'Os campos vindos do FrontEnd não representam o método de login. Verifique.');
+                    'msg' => 'Os campos vindos do FrontEnd não representam o método de login. Verifique.'
+                );
             }
         } catch (Exception $e) {
             $retorno = array(
                 'codigo' => 0,
                 'msg' => 'ATENÇÃO: o seguinte erro aconteceu -> ',
-                $e->getMessage());
+                $e->getMessage()
+            );
         }
 
         //Retorno no formato JSON
+        echo json_encode($retorno);
+    }
+
+    public function listar()
+    {
+        // Função para listar os horários no Front sem necessidade de parâmentros
+        try {
+            $this->load->model('M_sala');
+
+            //Chama o método para buscar todas as turmas
+            $retorno = $this->M_sala->listarTodos();
+        } catch (Exception $e) {
+            $retorno = array(
+                'codigo' => 0,
+                'msg' => 'Erro ao listar os horarios: ' . $e . getMessage()
+            );
+        }
         echo json_encode($retorno);
     }
 }

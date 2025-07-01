@@ -19,23 +19,27 @@ class M_sala extends CI_Model
                 if ($this->db->affected_rows() > 0) {
                     $dados = array(
                         'codigo' => 1,
-                        'msg' => 'Sala cadastrada corretamente');
-                }
-                else{
+                        'msg' => 'Sala cadastrada corretamente'
+                    );
+                } else {
                     $dados = array(
                         'codigo' => 6,
-                        'msg' => 'Houve algum problema na inserção na tabela salas');
-                } 
+                        'msg' => 'Houve algum problema na inserção na tabela salas'
+                    );
+                }
             } else {
                 $dados = array(
                     'codigo' => $retornoConsulta['codigo'],
-                    'msg' => $retornoConsulta['msg']);
+                    'msg' => $retornoConsulta['msg']
+                );
             }
         } catch (Exception $e) {
             $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÃO: O seguinte erro aconteceu ->',
-                $e->getMessage(), "\n");
+                $e->getMessage(),
+                "\n"
+            );
         }
         //Envia o array $dados com as informações tratadas acima pela estrutura de decisão if
         return $dados;
@@ -56,23 +60,28 @@ class M_sala extends CI_Model
                 if (trim($linha->estatus) == "D") {
                     $dados = array(
                         'codigo' => 7,
-                        'msg' => 'Sala desativada no sistema, caso precise reativar a mesma, fale com o administrador.');
+                        'msg' => 'Sala desativada no sistema, caso precise reativar a mesma, fale com o administrador.'
+                    );
                 } else {
 
                     $dados = array(
                         'codigo' => 8,
-                        'msg' => 'Sala já cadastrada no sistema.');
+                        'msg' => 'Sala já cadastrada no sistema.'
+                    );
                 }
             } else {
                 $dados = array(
                     'codigo' => 6,
-                    'msg' => 'Sala não encontrada.');
+                    'msg' => 'Sala não encontrada.'
+                );
             }
         } catch (Exception $e) {
             $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
-                $e->getMessage(), "\n");
+                $e->getMessage(),
+                "\n"
+            );
         }
         // Envia o array $dados com as informações tratadas acima pela estrutura de decisão if
         return $dados;
@@ -108,17 +117,21 @@ class M_sala extends CI_Model
                 $dados = array(
                     'codigo' => 1,
                     'msg' => 'Consulta efetuada com sucesso.',
-                    'dados' => $retorno->result());
+                    'dados' => $retorno->result()
+                );
             } else {
                 $dados = array(
                     'codigo' => 6,
-                    'msg' => 'Sala não encontrada.');
+                    'msg' => 'Sala não encontrada.'
+                );
             }
         } catch (Exception $e) {
             $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
-                $e->getMessage(), "\n");
+                $e->getMessage(),
+                "\n"
+            );
         }
         //Enviar o array $dados com as infromações tratadas acimapela estrutura de decisão if
         return $dados;
@@ -157,22 +170,27 @@ class M_sala extends CI_Model
                 if ($this->db->affected_rows() > 0) {
                     $dados = array(
                         'codigo' => 1,
-                        'msg' => 'Sala atualizada corretamente.');
+                        'msg' => 'Sala atualizada corretamente.'
+                    );
                 } else {
                     $dados = array(
                         'codigo' => 6,
-                        'msg' => 'Houve algum problema na atualização da sala.');
+                        'msg' => 'Houve algum problema na atualização da sala.'
+                    );
                 }
             } else {
                 $dados = array(
                     'codigo' => 5,
-                    'msg' => 'Sala não cadastrada no sistema.');
+                    'msg' => 'Sala não cadastrada no sistema.'
+                );
             }
         } catch (Exception $e) {
             $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
-                $e->getMessage(), "\n");
+                $e->getMessage(),
+                "\n"
+            );
         }
         //Envia o array $dados com as infromações tratadas acima pela estrutura de decisão if
         return $dados;
@@ -193,24 +211,59 @@ class M_sala extends CI_Model
                 if ($this->db->affected_rows() > 0) {
                     $dados = array(
                         'codigo' => 1,
-                        'msg' => 'Sala DESATIVADA corretamente');
+                        'msg' => 'Sala DESATIVADA corretamente'
+                    );
                 } else {
                     $dados = array(
                         'codigo' => 5,
-                        'msg' => 'Houve algum problema na DESATIVAÇÃO da Sala.');
+                        'msg' => 'Houve algum problema na DESATIVAÇÃO da Sala.'
+                    );
                 }
             } else {
                 $dados = array(
                     'codigo' => 6,
-                    'msg' => 'Sala não cadastrada no Sistema, não pode excluir.');
+                    'msg' => 'Sala não cadastrada no Sistema, não pode excluir.'
+                );
             }
         } catch (Exception $e) {
             $dados = array(
                 'codigo' => 00,
                 'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ',
-                $e->getMessage(), "\n");
+                $e->getMessage(),
+                "\n"
+            );
         }
         //Envia o array $dados com as informações tratadas acima pela estrutura de decisão if
         return $dados;
+    }
+
+    public function listarTodos()
+    {
+        try {
+            //Query para consultar dados de acordo com parâmetros passados
+            $sql = "select * from tbl_sala where estatus = ''
+                    order by codigo";
+            $retorno = $this->db->query($sql);
+
+            //Verificar se a consulta ocorreu com sucesso
+            if ($retorno->num_rows() > 0) {
+                $dados = array(
+                    'codigo' => 1,
+                    'msg' => 'Consulta efetuada com sucesso.',
+                    'dados' => $retorno->result()
+                );
+            } else {
+                $dados = array(
+                    'codigo' => 6,
+                    'msg' => 'Sala não encontrada'
+                );
+            }
+        } catch (Exception $e) {
+            $dados = array(
+                'codigo' => 00,
+                'msg' => 'ATENÇÃO: O seguinte erro aconteceu -> ' . $e->getMessage()
+            );
+        }
+        return $dados; // Retorna um array de objetos
     }
 }
